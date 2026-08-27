@@ -12,11 +12,11 @@ A full-stack decision system that identifies failed payments where a retry is ex
 
 The system estimates the treatment effect of a retry, applies a policy threshold, executes controlled recovery actions, and records every decision in an auditable trail.
 
-Live Demo
+ Live Demo
 
 Watch the deployed AI Revenue Recovery Causal Lab in action.
 
-<video src="./demo/recoverycausallablivedemo.mp4" controls width="800"></video>
+![Live Demo](./demo/recoveryclab.gif)
 
 Frontend: https://revenue-recovery-causal-lab-frontend.onrender.com
 
