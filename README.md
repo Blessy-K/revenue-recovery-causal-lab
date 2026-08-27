@@ -16,7 +16,7 @@ Live Demo
 
 Watch the deployed AI Revenue Recovery Causal Lab in action.
 
-![Live Demo](./demo/recoveryclab.gif)
+<video src="./demo/recoverycausallablivedemo.mp4" controls width="800"></video>
 
 Frontend: https://revenue-recovery-causal-lab-frontend.onrender.com
 
