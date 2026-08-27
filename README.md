@@ -1,32 +1,28 @@
-Revenue Recovery Causal Lab
+AI Revenue Recovery Causal Lab
 
 
 
-AI powered payment recovery and incremental revenue analysis system
+Causal AI-powered payment recovery and incremental revenue optimization
 
 
 
-Project Overview
+A full-stack decision system that identifies failed payments where a retry is expected to create incremental recovery, rather than blindly retrying every failed transaction.
 
 
 
-Revenue Recovery Causal Lab is a machine learning based payment recovery system that helps identify which failed payments are actually worth retrying.
+The system estimates the treatment effect of a retry, applies a policy threshold, executes controlled recovery actions, and records every decision in an auditable trail.
+
+Live Demo
+
+Watch the deployed AI Revenue Recovery Causal Lab in action.
+
+./demo/recoverycausallablivedemo.mp4
+
+Frontend: https://revenue-recovery-causal-lab-frontend.onrender.com
 
 
 
-When a payment fails, retrying every failed payment is not always the best approach. Some customers may complete their payment later without any retry. If we simply count every recovered payment after a retry as successful recovery, we cannot know how much revenue was actually caused by the retry.
-
-
-
-This project addresses that problem using treatment and control analysis, machine learning and causal uplift estimation.
-
-
-
-The system estimates the probability of recovery when a payment is retried and compares it with the estimated probability of recovery without a retry. The difference between these two probabilities is used as the predicted uplift.
-
-
-
-Based on the uplift, the system recommends retries only for payments where the expected benefit is high enough and estimates the incremental revenue that could be generated.
+Backend API: https://revenue-recovery-causal-lab.onrender.com
 
 
 
@@ -34,571 +30,579 @@ Problem
 
 
 
-Traditional payment recovery systems often use simple retry rules. For example, they may retry every failed payment after a certain period.
+Traditional payment recovery systems often use fixed retry rules such as:
 
 
 
-The problem is that not every failed payment needs an intervention. Some customers would have completed the payment naturally.
+"If a payment fails, try again."
 
 
 
-Because of this, simply measuring the total number of recovered payments does not tell us the actual impact of the retry strategy.
+This can create unnecessary retries for payments that are unlikely to recover and does not distinguish between:
 
 
 
-The important question is:
+Payments that benefit from a retry
+
+Payments that are unlikely to benefit
+
+Payments that should be reviewed manually
 
 
 
-How much additional recovery was actually caused by the retry?
+This project approaches recovery as a causal decision problem.
 
 
 
-Our Solution
+Instead of asking:
 
 
 
-The system treats a retry as an intervention and compares two possible outcomes for each payment.
+"Will this payment succeed?"
 
 
 
-The first is the probability that the payment will recover with a retry.
+the system asks:
 
 
 
-The second is the probability that the payment will recover without a retry.
+"How much more likely is this payment to recover if we retry it?"
 
 
 
-The difference between these probabilities represents the predicted uplift.
+Solution
 
 
 
-If the predicted uplift is at least 10 percent, the system recommends retrying the payment.
-
-
-
-This allows the system to focus recovery efforts on payments where the retry is expected to make a meaningful difference instead of retrying every failed payment.
-
-
-
-How the System Works
-
-
-
-The complete workflow is:
-
-
-
-Failed payment data
-
-
-
-Payment and customer features
-
-
-
-Treatment and control analysis
-
-
-
-Machine learning recovery prediction
+The system estimates two potential outcomes for each failed payment:
 
 
 
 Probability with retry
 
-
-
 Probability without retry
 
 
 
-Predicted causal uplift
+The difference between these outcomes is the predicted causal uplift.
 
 
 
-Retry decision
+Causal Uplift = P(Recovery | Retry) - P(Recovery | No Retry)
 
 
 
-Expected incremental revenue
+A policy gate then determines whether an intervention should be executed.
 
 
 
-Dashboard and API
+If uplift >= 10%  → Retry
 
+If uplift < 10%   → Do Not Retry
 
 
-For every payment, the system calculates:
 
+This allows the system to focus recovery actions on payments where the intervention is predicted to provide meaningful incremental benefit.
 
 
-Probability with retry
 
+Key Features
 
+Causal uplift prediction for failed payments
 
-Probability without retry
+Treatment vs. control recovery analysis
 
+Policy-controlled retry decisions
 
+Incremental revenue estimation
 
-Predicted uplift
+Recovery execution simulation
 
+Maximum retry protection
 
+Manual review routing for failed interventions
 
-Retry recommendation
+Already-processed payment protection
 
+Recovery audit trail
 
+React-based monitoring dashboard
 
-Expected incremental revenue
+FastAPI backend APIs
 
+Deployed frontend and backend
 
+System Workflow
 
-Example
+Failed Payment
 
+&#x20;     ↓
 
+Customer / Payment Features
 
-Suppose a payment has the following predictions:
+&#x20;     ↓
 
+Causal Prediction
 
+&#x20;     ↓
 
-Probability with retry: 62.5 percent
+P(Recovery | Retry)
 
+P(Recovery | No Retry)
 
+&#x20;     ↓
 
-Probability without retry: 52.4 percent
+Calculate Uplift
 
+&#x20;     ↓
 
+Policy Gate
 
-Predicted uplift: 10.1 percent
+&#x20;     ↓
 
+&#x20;┌───────────────┐
 
+&#x20;│ Uplift >= 10% │
 
-Since the uplift is greater than our 10 percent threshold, the system recommends retrying this payment.
+&#x20;└───────┬───────┘
 
+&#x20;        ↓
 
+&#x20;      Retry
 
-The expected incremental revenue is then estimated using the payment amount and predicted uplift.
+&#x20;        ↓
 
+&#x20;┌──────────────────────┐
 
+&#x20;│ Recovered?           │
 
-Causal Approach
+&#x20;└───────┬──────────────┘
 
+&#x20;        │
 
+&#x20;   ┌────┴─────┐
 
-The project uses a treatment and control approach.
+&#x20;   ↓          ↓
 
+Recovered   Failed
 
+&#x20;   ↓          ↓
 
-The treatment group represents payments where a retry was attempted.
+&#x20;Closed    Manual Review
 
 
 
-The control group represents payments where no retry was attempted.
+Payments below the intervention threshold are stopped by policy without executing a retry.
 
 
 
-We first compare the actual recovery rates between these groups to understand the observed treatment effect.
+Architecture
 
+&#x20;                   ┌──────────────────────┐
 
+&#x20;                   │      React UI        │
 
-The machine learning component then estimates recovery probabilities for individual payments under both retry and no-retry conditions.
+&#x20;                   │  Monitoring Dashboard│
 
+&#x20;                   └──────────┬───────────┘
 
+&#x20;                              │ REST API
 
-Predicted uplift is calculated as:
+&#x20;                              ↓
 
+&#x20;                   ┌──────────────────────┐
 
+&#x20;                   │     FastAPI Backend   │
 
-Probability with retry minus probability without retry
+&#x20;                   ├──────────────────────┤
 
+&#x20;                   │ Recovery Service     │
 
+&#x20;                   │ Recovery Agent       │
 
-This allows the system to make payment level decisions instead of applying the same retry strategy to every failed payment.
+&#x20;                   │ Policy Engine        │
 
+&#x20;                   │ Audit Trail          │
 
+&#x20;                   └──────────┬───────────┘
 
-Machine Learning
+&#x20;                              │
 
+&#x20;               ┌──────────────┴──────────────┐
 
+&#x20;               ↓                             ↓
 
-The project uses Random Forest classification models for recovery prediction.
+&#x20;      ┌─────────────────┐          ┌─────────────────┐
 
+&#x20;      │ ML / Causal     │          │ Payment Dataset │
 
+&#x20;      │ Prediction      │          │ payments.csv    │
 
-Payment and customer related features are used as inputs to the models.
+&#x20;      └─────────────────┘          └─────────────────┘
 
-
-
-Separate predictions are generated for the retry and no-retry scenarios.
-
-
-
-The predicted probabilities are then compared to calculate uplift.
-
-
-
-The current model is trained and evaluated using an 80 percent training split and a 20 percent testing split.
-
-
-
-Current model results on the generated dataset are:
-
-
-
-Accuracy: 55.45 percent
-
-
-
-Precision: 51.35 percent
-
-
-
-Recall: 47.81 percent
-
-
-
-ROC AUC: 56.22 percent
-
-
-
-These results are based on the generated dataset used for this prototype and are intended to demonstrate the working of the recovery and uplift approach.
-
-
-
-Current Results
-
-
-
-The current dataset contains 10,000 payment records.
-
-
-
-Payments recommended for retry: 369
-
-
-
-Payments not recommended for retry: 9,631
-
-
-
-Average predicted uplift: 0.29 percent
-
-
-
-Observed treatment effect: 5.68 percent
-
-
-
-Estimated incremental revenue: Rs. 22,806.90
-
-
-
-The 369 recommended payments are the payments for which the predicted uplift reaches at least the 10 percent retry threshold.
-
-
-
-The estimated revenue is calculated from the predicted uplift and payment amount. It represents potential incremental revenue on the generated dataset and is not actual production revenue.
-
-
-
-System Architecture
-
-
-
-The project has three main parts.
-
-
+Technology Stack
 
 Frontend
-
-
-
-The frontend is built using React and Vite. It provides a dashboard where the recovery results and recommendations can be viewed.
-
-
-
-Backend
-
-
-
-The backend is built using Python and FastAPI. It provides APIs that expose the recovery analysis and prediction results to the frontend.
-
-
-
-Machine Learning Pipeline
-
-
-
-The machine learning pipeline is responsible for generating payment data, analyzing treatment and control recovery rates, training the recovery model and calculating predicted uplift.
-
-
-
-The overall architecture is:
-
-
-
-React Dashboard
-
-
-
-connects to
-
-
-
-FastAPI Backend
-
-
-
-connects to
-
-
-
-Recovery Service
-
-
-
-connects to
-
-
-
-Machine Learning and Prediction Pipeline
-
-
-
-uses
-
-
-
-Payment Dataset and Recovery Predictions
-
-
-
-Technology Used
-
-
-
-Frontend
-
-
 
 React
 
-
-
 Vite
 
-
-
-JavaScript
-
-
-
-Recharts
-
-
+Axios
 
 CSS
 
-
-
 Backend
-
-
 
 Python
 
-
-
 FastAPI
-
-
 
 Uvicorn
 
+Machine Learning
 
-
-Pandas
-
-
-
-NumPy
-
-
+Python
 
 Scikit-learn
 
+Causal uplift modeling
 
+Treatment/control outcome estimation
 
-Machine Learning
+Deployment
 
+GitHub
 
+Render
 
-Random Forest Classifier
+REST APIs
 
+API Endpoints
 
-
-One Hot Encoding
-
-
-
-Treatment and Control Modeling
-
-
-
-Causal Uplift Analysis
-
-
-
-Project Structure
-
-
-
-backend/app contains the FastAPI application and recovery service.
-
-
-
-backend/ml contains the machine learning and analysis scripts.
-
-
-
-data contains the generated payment dataset and recovery predictions.
-
-
-
-frontend contains the React dashboard.
-
-
-
-tests contains the backend API tests.
-
-
-
-requirements.txt contains the Python dependencies.
-
-
-
-README.md contains the project documentation.
-
-
-
-Main Files
-
-
-
-backend/app/main.py
-
-
-
-Contains the FastAPI application and API endpoints.
-
-
-
-backend/app/recovery\_service.py
-
-
-
-Handles recovery prediction results and summary information used by the API.
-
-
-
-backend/ml/generate\_data.py
-
-
-
-Generates the payment dataset used for the project.
-
-
-
-backend/ml/analyze\_recovery.py
-
-
-
-Analyzes recovery rates between treatment and control groups.
-
-
-
-backend/ml/train\_model.py
-
-
-
-Trains and evaluates the Random Forest recovery model.
-
-
-
-backend/ml/causal\_model.py
-
-
-
-Calculates predicted recovery probabilities, uplift, retry recommendations and expected incremental revenue.
-
-
-
-API
-
-
-
-The backend provides the following endpoints.
-
-
+Health Check
 
 GET /
 
 
 
-Returns the API status.
+Returns the API service status.
 
 
 
-GET /health
-
-
-
-Checks whether the backend is running.
-
-
+Recovery Summary
 
 GET /api/recovery/summary
 
 
 
-Returns the overall recovery summary including total payments, retry recommendations, average uplift and estimated incremental revenue.
+Returns overall payment and recovery information.
 
 
 
-The FastAPI documentation is available at:
+Recovery Metrics
+
+GET /api/recovery/metrics
 
 
 
-http://127.0.0.1:8000/docs
+Returns execution metrics such as:
 
 
 
-Dashboard
+Payments evaluated
+
+Eligible payments
+
+Interventions executed
+
+Payments recovered
+
+Manual reviews
+
+Recovered revenue
+
+Execution recovery rate
+
+Recommendations
+
+GET /api/recovery/recommendations
 
 
 
-The React dashboard provides a visual summary of the recovery analysis.
+Returns payments ranked by predicted causal uplift and expected incremental revenue.
 
 
 
-It displays the total number of payments analyzed, payments recommended for retry, payments not recommended for retry and estimated incremental revenue.
+Execute Recovery
+
+POST /api/recovery/execute/{payment\_id}
 
 
 
-The dashboard is connected to the FastAPI backend and displays the results generated by the recovery pipeline.
+Runs the policy-controlled recovery decision for a payment.
 
 
 
-Running the Project
+Audit Trail
+
+GET /api/recovery/audit
 
 
 
-Create and activate the Python virtual environment.
+Returns recorded recovery decisions and their outcomes.
 
 
 
-Install the required Python packages using:
+Example Decision
+
+
+
+For a payment with:
+
+
+
+Amount: ₹131.55
+
+
+
+Probability with retry:    59.30%
+
+Probability without retry: 39.58%
+
+
+
+Predicted uplift:           19.71%
+
+
+
+Since:
+
+
+
+19.71% >= 10%
+
+
+
+the policy allows a retry.
+
+
+
+If the retry fails, the system does not continuously retry the payment. It reaches the maximum retry policy and routes the payment to:
+
+
+
+Manual Review
+
+
+
+This prevents uncontrolled intervention loops.
+
+
+
+Protection Against Duplicate Actions
+
+
+
+The recovery agent maintains payment state.
+
+
+
+If a payment has already reached a terminal state, another execution request does not trigger a new retry.
+
+
+
+Example:
+
+
+
+Payment: P06136
+
+Decision: Retry
+
+Result: Recovered
+
+Next Action: Closed
+
+
+
+A subsequent request returns:
+
+
+
+Action: Already Processed
+
+Status: Already Processed
+
+
+
+This provides basic idempotent behavior for the recovery workflow.
+
+
+
+Current Demonstration Results
+
+
+
+The deployed system currently evaluates:
+
+
+
+Metric	Value
+
+Payments evaluated	10,000
+
+Eligible for retry	369
+
+Payments not targeted	9,631
+
+Interventions executed	6
+
+Payments recovered	3
+
+Manual reviews	3
+
+Recovered transaction value	₹934.67
+
+Execution recovery rate	50.0%
+
+Estimated incremental revenue	₹22,806.90
+
+
+
+The 369 eligible payments are those whose predicted causal uplift is at least 10%.
+
+
+
+Recovery Execution Examples
+
+
+
+The demo includes multiple policy outcomes:
+
+
+
+Successful Recovery
+
+P06136
+
+Uplift: 10.08%
+
+Decision: Retry
+
+Result: Recovered
+
+Next Action: Closed
+
+Policy Rejection
+
+P03689
+
+Uplift: -21.55%
+
+Decision: Do Not Retry
+
+Result: Not Executed
+
+Next Action: No Intervention
+
+Failed Intervention
+
+P09095
+
+Uplift: 19.71%
+
+Decision: Retry
+
+Result: Failed
+
+Next Action: Manual Review
+
+
+
+These cases demonstrate that the system is not simply predicting "retry" — it also controls and records the resulting action.
+
+
+
+Project Structure
+
+revenue-recovery-causal-lab/
+
+│
+
+├── backend/
+
+│   ├── app/
+
+│   │   ├── main.py
+
+│   │   ├── recovery\_service.py
+
+│   │   └── recovery\_agent.py
+
+│   │
+
+│   └── ml/
+
+│       ├── generate\_data.py
+
+│       ├── train\_model.py
+
+│       ├── causal\_model.py
+
+│       └── analyze\_recovery.py
+
+│
+
+├── data/
+
+│   └── payments.csv
+
+│
+
+├── frontend/
+
+│   ├── src/
+
+│   │   └── App.jsx
+
+│   ├── package.json
+
+│   └── vite.config.js
+
+│
+
+└── README.md
+
+Running Locally
+
+1\. Clone the repository
+
+git clone https://github.com/Blessy-K/revenue-recovery-causal-lab.git
+
+cd revenue-recovery-causal-lab
+
+2\. Backend setup
+
+
+
+Create and activate a virtual environment:
+
+
+
+python -m venv venv
+
+
+
+Windows:
+
+
+
+venv\\Scripts\\activate
+
+
+
+Install dependencies:
 
 
 
@@ -606,173 +610,207 @@ pip install -r requirements.txt
 
 
 
-Generate the payment dataset using:
+Start FastAPI:
 
 
 
-python backend/ml/generate\_data.py
+uvicorn backend.app.main:app --reload --port 8000
 
 
 
-Run the recovery analysis using:
-
-
-
-python backend/ml/analyze\_recovery.py
-
-
-
-Train the machine learning model using:
-
-
-
-python backend/ml/train\_model.py
-
-
-
-Run the causal analysis using:
-
-
-
-python backend/ml/causal\_model.py
-
-
-
-Start the FastAPI backend using:
-
-
-
-python -m uvicorn backend.app.main:app --reload
-
-
-
-The backend will normally run at:
+Backend:
 
 
 
 http://127.0.0.1:8000
 
+3\. Frontend setup
 
 
-Open another terminal and start the frontend:
+
+Open another terminal:
 
 
 
 cd frontend
 
-
-
 npm install
-
-
 
 npm run dev
 
 
 
-The dashboard will normally run at:
+Frontend:
 
 
 
 http://localhost:5173
 
-
-
-Testing
-
-
-
-The project includes backend API tests using pytest.
+Example API Test
 
 
 
-Run the tests using:
+Check the recommendations:
 
 
 
-python -m pytest
+curl http://127.0.0.1:8000/api/recovery/recommendations
 
 
 
-The current test suite contains 4 API tests and all 4 tests are passing.
+Execute a recovery decision:
 
 
 
-Demo Video
+curl -X POST http://127.0.0.1:8000/api/recovery/execute/P09095
 
 
 
-A five minute demonstration of the project will show the problem, solution, workflow, machine learning approach, FastAPI backend, React dashboard, recovery recommendations and final results.
+Check the audit trail:
 
 
 
-Demo video:
+curl http://127.0.0.1:8000/api/recovery/audit
+
+Design Principles
+
+1\. Intervention over prediction
 
 
 
-VIDEO LINK WILL BE ADDED HERE
+The objective is not simply to predict whether a payment will recover.
 
 
 
-Build Challenges
+The system estimates whether taking an action changes the expected outcome.
 
 
 
-One of the main challenges was distinguishing recovery caused by a retry from recovery that would have happened naturally.
+2\. Policy-controlled automation
 
 
 
-To address this, the project uses treatment and control groups and calculates the difference between retry and no-retry outcomes.
+Machine learning does not directly execute unlimited retries.
 
 
 
-Another challenge was converting the machine learning predictions into useful payment level decisions. This was handled by generating separate recovery probabilities for the retry and no-retry scenarios and calculating the predicted uplift for each payment.
+The policy layer determines whether the predicted benefit is large enough to justify intervention.
 
 
 
-Another challenge was connecting the machine learning results with the FastAPI backend and React dashboard. The recovery service was used to expose the prediction results through APIs, which are then consumed by the frontend.
+3\. Incremental revenue
 
 
 
-API testing was also added to verify that the backend endpoints return the expected results.
+The system focuses on the revenue attributable to the intervention rather than treating every recovered payment as automatically caused by the retry.
 
 
+
+4\. Safe execution
+
+
+
+Recovery attempts are bounded and terminal states prevent duplicate interventions.
+
+
+
+5\. Auditability
+
+
+
+Every decision records:
+
+
+
+Payment ID
+
+Predicted uplift
+
+Decision
+
+Action
+
+Result
+
+Retry attempt
+
+Recovered amount
+
+Incremental revenue
+
+Stop reason
+
+Next action
+
+Limitations
+
+
+
+This project uses a simulated payment dataset and simulated recovery outcomes for demonstration purposes.
+
+
+
+The predicted uplift and incremental revenue figures should therefore be interpreted as model/simulation outputs, not production payment-processing results.
+
+
+
+A production implementation would require:
+
+
+
+Real payment gateway integration
+
+Online experimentation
+
+Robust causal identification
+
+Model monitoring
+
+Feature drift detection
+
+Fraud and risk controls
+
+Customer communication policies
+
+Stronger persistence and distributed state management
 
 Future Improvements
 
+Real payment gateway integration
 
+Online A/B experimentation
 
-The current project uses a generated dataset for demonstrating the complete workflow.
+More advanced uplift modeling
 
+Model explainability
 
+Real-time feature pipelines
 
-Future versions could use a larger real world payment dataset and additional customer and transaction features.
+Persistent recovery state
 
+Retry scheduling and cooldown windows
 
+Cost-aware intervention optimization
 
-More advanced uplift modeling techniques could also be evaluated and the model could be monitored over time for changes in performance.
+Monitoring and alerting
 
-
-
-The system could also be extended with payment gateway integration, scheduled recovery campaigns, real time decision making and cloud deployment.
-
-
-
-Conclusion
-
-
-
-Revenue Recovery Causal Lab focuses on a simple but important idea: recovering money after a retry is not the same as proving that the retry caused the recovery.
+Automated model retraining
 
 
 
-By combining machine learning with treatment and control analysis and uplift based decision making, the system identifies payments where a retry is more likely to create additional recovery.
+Author
+
+Blessy K.
 
 
 
-The current prototype analyzes 10,000 payments, recommends 369 targeted retries and estimates Rs. 22,806.90 in potential incremental revenue on the generated dataset.
+B.Tech — Computer Science \& Engineering (Data Science)
 
 
 
-The complete source code and implementation are available in this repository.
+ACE Engineering College, Hyderabad
+
+
+
+GitHub: https://github.com/Blessy-K/revenue-recovery-causal-lab
 
