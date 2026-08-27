@@ -1,0 +1,7 @@
+timestamp,payment_id,amount,failure_reason,predicted_uplift,decision,action,attempt_number,result,recovered_amount,incremental_revenue,status,stop_reason,next_action
+2026-08-27T14:56:56,P03689,461.6,insufficient_funds,-0.2155273530222267,do_not_retry,none,0,not_executed,0.0,0.0,stopped,uplift_below_intervention_threshold,no_intervention
+2026-08-27T14:57:41,P06136,737.22,bank_declined,0.1008034073689811,retry,retry,1,recovered,737.22,74.31428798056028,stopped,payment_recovered,closed
+2026-08-27T14:58:14,P05999,122.96,limit_exceeded,0.1993618421192747,retry,retry,1,failed,0.0,0.0,stopped,maximum_retry_attempts_reached,manual_review
+2026-08-27T15:01:22,P05933,113.71,limit_exceeded,0.2187960704655859,retry,retry,1,recovered,113.71,24.87930117264177,stopped,payment_recovered,closed
+2026-08-27T15:03:30,P05799,83.74,timeout,0.2022396406996244,retry,retry,1,recovered,83.74,16.935547512186552,stopped,payment_recovered,closed
+2026-08-27T15:04:28,P08305,612.37,network_error,0.1633357502738595,retry,retry,1,failed,0.0,0.0,stopped,maximum_retry_attempts_reached,manual_review

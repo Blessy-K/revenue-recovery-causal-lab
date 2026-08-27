@@ -52,7 +52,7 @@ preprocessor = ColumnTransformer(
 model = RandomForestClassifier(
     n_estimators=300,
     max_depth=8,
-    min_samples_leaf=10,
+    min_samples_leaf=20,
     random_state=42,
     class_weight="balanced"
 )
