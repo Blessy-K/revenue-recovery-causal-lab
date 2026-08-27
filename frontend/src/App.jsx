@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import "./App.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://revenue-recovery-causal-lab.onrender.com";
 
 function App() {
   const [summary, setSummary] = useState(null);
