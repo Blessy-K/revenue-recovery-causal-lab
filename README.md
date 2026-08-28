@@ -134,61 +134,8 @@ Deployed frontend and backend
 
 System Workflow
 
-Failed Payment
 
-&#x20;     ↓
-
-Customer / Payment Features
-
-&#x20;     ↓
-
-Causal Prediction
-
-&#x20;     ↓
-
-P(Recovery | Retry)
-
-P(Recovery | No Retry)
-
-&#x20;     ↓
-
-Calculate Uplift
-
-&#x20;     ↓
-
-Policy Gate
-
-&#x20;     ↓
-
-&#x20;┌───────────────┐
-
-&#x20;│ Uplift >= 10% │
-
-&#x20;└───────┬───────┘
-
-&#x20;        ↓
-
-&#x20;      Retry
-
-&#x20;        ↓
-
-&#x20;┌──────────────────────┐
-
-&#x20;│ Recovered?           │
-
-&#x20;└───────┬──────────────┘
-
-&#x20;        │
-
-&#x20;   ┌────┴─────┐
-
-&#x20;   ↓          ↓
-
-Recovered   Failed
-
-&#x20;   ↓          ↓
-
-&#x20;Closed    Manual Review
+![AI Revenue Recovery Causal Lab Workflow](./archirevflow.png)
 
 
 
@@ -228,7 +175,7 @@ Architecture
 
 &#x20;                              │
 
-&#x20;               ┌──────────────┴──────────────┐
+&#x20;                                   ┌──────────────┴──────────────┐
 
 &#x20;               ↓                             ↓
 
