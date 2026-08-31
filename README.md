@@ -81,157 +81,238 @@ The difference between these outcomes is the predicted causal uplift.
 
 ```text
 Causal Uplift =
+
 P(Recovery | Retry) - P(Recovery | No Retry)
+```
 
 A policy gate then determines whether an intervention should be executed:
 
-| Predicted Uplift | Decision     |
+| Predicted Uplift | Decision |
 | ---------------: | ------------ |
-|            ≥ 10% | Retry        |
-|            < 10% | Do Not Retry |
+| ≥ 10% | Retry |
+| < 10% | Do Not Retry |
 
 This allows the system to focus recovery actions on payments where the intervention is predicted to provide meaningful incremental benefit.
 
 The model recommends. The policy decides.
 
-Key Features
+---
+
+## Key Features
+
 Causal uplift prediction for failed payments
+
 Treatment vs. control recovery analysis
+
 Policy-controlled retry decisions
+
 Incremental revenue estimation
+
 Recovery execution simulation
+
 Maximum retry protection
+
 Manual review routing for failed interventions
+
 Already-processed payment protection
+
 Recovery audit trail
+
 React-based monitoring dashboard
+
 FastAPI backend APIs
+
 Deployed frontend and backend
 
+---
 
-System Workflow
+## System Workflow
 
-AI Revenue Recovery Causal Lab Workflow
+![AI Revenue Recovery Causal Lab Workflow](./archirevflow.png)
 
 Payments below the intervention threshold are stopped by policy without executing a retry.
 
+```text
 Failed Payment
-      │
-      ▼
+
+     │
+
+     ▼
+
 ML / Causal Prediction
-      │
-      ├── Probability with Retry
-      │
-      └── Probability without Retry
-      │
-      ▼
+
+     │
+
+     ├── Probability with Retry
+
+     │
+
+     └── Probability without Retry
+
+     │
+
+     ▼
+
 Predicted Uplift
-      │
-      ▼
+
+     │
+
+     ▼
+
 Policy Threshold
-      │
-      ├── Uplift ≥ 10% ──► Retry
-      │                         │
-      │                         ├── Recovered ──► Closed
-      │                         │
-      │                         └── Failed ────► Manual Review
-      │
-      └── Uplift < 10% ──► Do Not Retry
 
+     │
 
-Architecture
+     ├── Uplift ≥ 10% ──► Retry
 
-                   ┌──────────────────────┐
-                   │       React UI       │
-                   │  Monitoring Dashboard│
-                   └──────────┬───────────┘
-                              │
-                              │ REST API
-                              ▼
-                   ┌──────────────────────┐
-                   │    FastAPI Backend   │
-                   ├──────────────────────┤
-                   │ Recovery Service     │
-                   │ Recovery Agent       │
-                   │ Policy Engine        │
-                   │ Audit Trail          │
-                   └──────────┬───────────┘
-                              │
-                 ┌────────────┴────────────┐
-                 ▼                         ▼
-        ┌─────────────────┐       ┌─────────────────┐
-        │ ML / Causal     │       │ Payment Dataset │
-        │ Prediction      │       │ payments.csv    │
-        └─────────────────┘       └─────────────────┘
+     │                         │
 
-Technology Stack
-Frontend
+     │                         ├── Recovered ──► Closed
+
+     │                         │
+
+     │                         └── Failed ────► Manual Review
+
+     │
+
+     └── Uplift < 10% ──► Do Not Retry
+```
+
+---
+
+## Architecture
+
+```text
+                    ┌──────────────────────┐
+                    │       React UI       │
+                    │  Monitoring Dashboard│
+                    └──────────┬───────────┘
+                               │
+                               │ REST API
+                               ▼
+                    ┌──────────────────────┐
+                    │    FastAPI Backend   │
+                    ├──────────────────────┤
+                    │ Recovery Service     │
+                    │ Recovery Agent       │
+                    │ Policy Engine        │
+                    │ Audit Trail          │
+                    └──────────┬───────────┘
+                               │
+                 ┌─────────────┴─────────────┐
+                 ▼                           ▼
+        ┌─────────────────┐         ┌─────────────────┐
+        │ ML / Causal     │         │ Payment Dataset │
+        │ Prediction      │         │ payments.csv    │
+        └─────────────────┘         └─────────────────┘
+```
+
+---
+
+## Technology Stack
+
+### Frontend
+
 React
+
 Vite
+
 Axios
+
 CSS
-Backend
+
+### Backend
+
 Python
+
 FastAPI
+
 Uvicorn
-Machine Learning
+
+### Machine Learning
+
 Python
+
 Scikit-learn
+
 Causal uplift modeling
+
 Treatment/control outcome estimation
-Deployment
+
+### Deployment
+
 GitHub
+
 Render
+
 REST APIs
 
-API Endpoints
+---
 
-Health Check
+## API Endpoints
+
+### Health Check
+
 GET /
+
 Returns the API service status.
 
-Recovery Summary
+### Recovery Summary
+
 GET /api/recovery/summary
+
 Returns overall payment and recovery information.
 
-Recovery Metrics
+### Recovery Metrics
+
 GET /api/recovery/metrics
+
 Returns execution metrics such as:
 
-Payments evaluated
-Eligible payments
-Interventions executed
-Payments recovered
-Manual reviews
-Recovered revenue
-Execution recovery rate
+- Payments evaluated
+- Eligible payments
+- Interventions executed
+- Payments recovered
+- Manual reviews
+- Recovered revenue
+- Execution recovery rate
 
-Recommendations
+### Recommendations
 
 GET /api/recovery/recommendations
+
 Returns payments ranked by predicted causal uplift and expected incremental revenue.
 
-Execute Recovery
+### Execute Recovery
+
 POST /api/recovery/execute/{payment_id}
+
 Runs the policy-controlled recovery decision for a payment.
 
-Audit Trail
+### Audit Trail
+
 GET /api/recovery/audit
+
 Returns recorded recovery decisions and their outcomes.
 
-Example Decision
+---
+
+## Example Decision
 
 For a payment with:
 
-| Metric                    |   Value |
+| Metric | Value |
 | ------------------------- | ------: |
-| Amount                    | ₹131.55 |
-| Probability with retry    |  59.30% |
-| Probability without retry |  39.58% |
-| Predicted uplift          |  19.71% |
+| Amount | ₹131.55 |
+| Probability with retry | 59.30% |
+| Probability without retry | 39.58% |
+| Predicted uplift | 19.71% |
 
 Since:
+
+```text
 19.71% ≥ 10%
+```
 
 the policy allows a retry.
 
@@ -241,7 +322,9 @@ Manual Review
 
 This prevents uncontrolled intervention loops.
 
-Protection Against Duplicate Actions
+---
+
+## Protection Against Duplicate Actions
 
 The recovery agent maintains payment state.
 
@@ -250,188 +333,283 @@ If a payment has already reached a terminal state, another execution request doe
 Example:
 
 Payment: P06136
+
 Decision: Retry
+
 Result: Recovered
+
 Next Action: Closed
 
 A subsequent request returns:
 
 Action: Already Processed
+
 Status: Already Processed
 
 This provides basic idempotent behavior for the recovery workflow.
 
-Current Demonstration Results
+---
+
+## Current Demonstration Results
 
 The deployed system currently evaluates:
 
-| Metric                        |      Value |
+| Metric | Value |
 | ----------------------------- | ---------: |
-| Payments evaluated            |     10,000 |
-| Eligible for retry            |        369 |
-| Payments not targeted         |      9,631 |
-| Interventions executed        |          6 |
-| Payments recovered            |          3 |
-| Manual reviews                |          3 |
-| Recovered transaction value   |    ₹934.67 |
-| Execution recovery rate       |      50.0% |
+| Payments evaluated | 10,000 |
+| Eligible for retry | 369 |
+| Payments not targeted | 9,631 |
+| Interventions executed | 6 |
+| Payments recovered | 3 |
+| Manual reviews | 3 |
+| Recovered transaction value | ₹934.67 |
+| Execution recovery rate | 50.0% |
 | Estimated incremental revenue | ₹22,806.90 |
 
 The 369 eligible payments are those whose predicted causal uplift is at least 10%.
 
-Recovery Execution Examples
+---
+
+## Recovery Execution Examples
 
 The demo includes multiple policy outcomes.
 
-Successful Recovery
+### Successful Recovery
 
 Payment: P06136
+
 Uplift: 10.08%
+
 Decision: Retry
+
 Result: Recovered
+
 Next Action: Closed
 
-Policy Rejection
+### Policy Rejection
 
 Payment: P03689
+
 Uplift: -21.55%
+
 Decision: Do Not Retry
+
 Result: Not Executed
+
 Next Action: No Intervention
 
-Failed Intervention
+### Failed Intervention
 
 Payment: P09095
+
 Uplift: 19.71%
+
 Decision: Retry
+
 Result: Failed
+
 Next Action: Manual Review
 
 These cases demonstrate that the system is not simply predicting "retry" — it also controls and records the resulting action.
 
-Project Structure
+---
 
+## Project Structure
+
+```text
 revenue-recovery-causal-lab/
+
 │
+
 ├── backend/
+
 │   ├── app/
+
 │   │   ├── main.py
+
 │   │   ├── recovery_service.py
+
 │   │   └── recovery_agent.py
+
 │   │
+
 │   └── ml/
+
 │       ├── generate_data.py
+
 │       ├── train_model.py
+
 │       ├── causal_model.py
+
 │       └── analyze_recovery.py
+
 │
+
 ├── data/
+
 │   └── payments.csv
+
 │
+
 ├── frontend/
+
 │   ├── src/
+
 │   │   └── App.jsx
+
 │   ├── package.json
+
 │   └── vite.config.js
+
 │
+
 ├── demo/
+
 │   └── recoveryclab.gif
+
 │
+
 ├── tests/
+
 ├── archirevflow.png
+
 ├── requirements.txt
+
 └── README.md
+```
 
+---
 
-Running Locally
+## Running Locally
 
-1. Clone the Repository
+### 1. Clone the Repository
 
+```bash
 git clone https://github.com/Blessy-K/revenue-recovery-causal-lab.git
 cd revenue-recovery-causal-lab
+```
 
-2. Backend Setup
+### 2. Backend Setup
 
 Create and activate a virtual environment:
 
+```bash
 python -m venv venv
+```
 
 Windows:
 
+```bash
 venv\Scripts\activate
+```
 
 Install dependencies:
 
+```bash
 pip install -r requirements.txt
+```
 
 Start FastAPI:
 
+```bash
 uvicorn backend.app.main:app --reload --port 8000
+```
 
 Backend:
 
+```text
 http://127.0.0.1:8000
-3. Frontend Setup
+```
+
+### 3. Frontend Setup
 
 Open another terminal:
 
+```bash
 cd frontend
 npm install
 npm run dev
+```
 
 Frontend:
 
+```text
 http://localhost:5173
-Example API Tests
+```
+
+---
+
+## Example API Tests
 
 Check the recommendations:
 
+```bash
 curl http://127.0.0.1:8000/api/recovery/recommendations
+```
 
 Execute a recovery decision:
 
+```bash
 curl -X POST http://127.0.0.1:8000/api/recovery/execute/P09095
+```
 
 Check the audit trail:
 
+```bash
 curl http://127.0.0.1:8000/api/recovery/audit
+```
 
-Design Principles
-1. Intervention Over Prediction
+---
+
+## Design Principles
+
+### 1. Intervention Over Prediction
 
 The objective is not simply to predict whether a payment will recover.
 
 The system estimates whether taking an action changes the expected outcome.
 
-2. Policy-Controlled Automation
+### 2. Policy-Controlled Automation
 
 Machine learning does not directly execute unlimited retries.
 
 The policy layer determines whether the predicted benefit is large enough to justify intervention.
 
-3. Incremental Revenue
+### 3. Incremental Revenue
 
 The system focuses on the revenue attributable to the intervention rather than treating every recovered payment as automatically caused by the retry.
 
-4. Safe Execution
+### 4. Safe Execution
 
 Recovery attempts are bounded and terminal states prevent duplicate interventions.
 
-5. Auditability
+### 5. Auditability
 
 Every decision records:
 
 Payment ID
+
 Predicted uplift
+
 Decision
+
 Action
+
 Result
+
 Retry attempt
+
 Recovered amount
+
 Incremental revenue
+
 Stop reason
+
 Next action
-Limitations
+
+---
+
+## Limitations
 
 This project uses a simulated payment dataset and simulated recovery outcomes for demonstration purposes.
 
@@ -439,26 +617,42 @@ The predicted uplift and incremental revenue figures should therefore be interpr
 
 A production implementation would require:
 
+- Real payment gateway integration
+- Online experimentation
+- Robust causal identification
+- Model monitoring
+- Feature drift detection
+- Fraud and risk controls
+- Customer communication policies
+- Stronger persistence and distributed state management
+
+---
+
+## Future Improvements
+
 Real payment gateway integration
-Online experimentation
-Robust causal identification
-Model monitoring
-Feature drift detection
-Fraud and risk controls
-Customer communication policies
-Stronger persistence and distributed state management
-Future Improvements
-Real payment gateway integration
+
 Online A/B experimentation
+
 More advanced uplift modeling
+
 Model explainability
+
 Real-time feature pipelines
+
 Persistent recovery state
+
 Retry scheduling and cooldown windows
+
 Cost-aware intervention optimization
+
 Monitoring and alerting
+
 Automated model retraining
-Author
+
+---
+
+## Author
 
 Blessy K.
 
